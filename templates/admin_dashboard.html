@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理員後台 - 報價單管理</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .btn {
+            padding: 5px 10px;
+            margin: 0 5px;
+            cursor: pointer;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← 返回首頁</a>
+        <h1>管理員後台 - 報價單管理</h1>
+
+        {% if quotes %}
+        <table>
+            <thead>
+                <tr>
+                    <th>客戶名稱</th>
+                    <th>報價單號</th>
+                    <th>項目數量</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for quote in quotes %}
+                <tr>
+                    <td>{{ quote.client_name }}</td>
+                    <td>{{ quote.quote_id }}</td>
+                    <td>{{ quote.item_count }}項</td>
+                    <td>
+                        <a href="{{ quote.link }}" target="_blank" class="btn">查看</a>
+                        <button onclick="deleteQuote('{{ quote.client_name }}')" class="btn btn-danger">刪除</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <p>目前沒有任何報價單</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function deleteQuote(clientName) {
+            if (!confirm(`確定要刪除報價單：${clientName}\n\n嗎？此操作不可逆！`)) {
+                return;
+            }
+
+            fetch('/delete_quote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    client_name: clientName
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload(); // 重新載入頁面以更新列表
+                    } else {
+                        alert('刪除失敗: ' + data.message);
+                    }
+                })
+                .catch(err => {
+                    alert('刪除時發生錯誤: ' + err);
+                });
+        }
+    </script>
+</body>
+
+</html>

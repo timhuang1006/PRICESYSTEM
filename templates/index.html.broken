@@ -1,0 +1,482 @@
+<div class="container">
+    {% if is_static_quote and quote_client_name %}
+    <h1>{{ quote_client_name }} 報價單</h1>
+    {% else %}
+    <h1>二手機回收價報價系統</h1>
+    {% endif %}
+
+    {% if not is_static_quote %}
+    <div class="nav-tabs">
+        <a href="{{ url_for('index', type='iPhone') }}"
+            class="nav-link {% if type == 'iPhone' or not type %}active{% endif %}">iPhone</a>
+        <a href="{{ url_for('index', type='Android') }}"
+            class="nav-link {% if type == 'Android' %}active{% endif %}">Android</a>
+    </div>
+    {% elif is_static_quote and iphone_data and android_data %}
+    <div class="nav-tabs">
+        <button onclick="switchStaticTab('iPhone')" class="nav-link active" id="tab-iphone">iPhone</button>
+        <button onclick="switchStaticTab('Android')" class="nav-link" id="tab-android">Android</button>
+    </div>
+    {% endif %}
+
+    <div class="controls">
+        {% if is_admin %}
+        <div class="action-group">
+            <label for="global-deduction">一鍵扣%:</label>
+            <input type="number" id="global-deduction" placeholder="%" style="width: 60px; padding: 5px;"
+                autocomplete="off">
+        </div>
+
+        <div class="action-group">
+            <input type="text" id="quote-name" placeholder="報價單名稱 / 指令" style="padding: 5px;" autocomplete="off">
+            <button onclick="handleCommand()" style="padding: 5px 10px; cursor: pointer;">執行</button>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if is_static_quote %}
+    <div class="quote-actions">
+        <button onclick="generatePDF()" class="action-btn pdf-btn">📄 生成PDF</button>
+        <button onclick="shareToLine()" class="action-btn line-btn">💬 傳送到LINE</button>
+    </div>
+    <div id="generation-date" style="display: none;"></div>
+    {% endif %}
+
+    {% if type == 'Android' and is_admin and not is_static_quote %}
+    <div class="brand-filters">
+        <button class="brand-btn" onclick="loadBrandData('Samsung')">Samsung</button>
+        <button class="brand-btn" onclick="loadBrandData('OPPO')">OPPO</button>
+        <button class="brand-btn" onclick="loadBrandData('Sony')">Sony</button>
+        <button class="brand-btn" onclick="loadBrandData('ASUS')">ASUS</button>
+        <button class="brand-btn" onclick="loadBrandData('HTC')">HTC</button>
+        <button class="brand-btn" onclick="loadBrandData('Xiaomi')">Xiaomi</button>
+        <button class="brand-btn" onclick="loadBrandData('Realme')">Realme</button>
+        <button class="brand-btn" onclick="loadBrandData('Vivo')">Vivo</button>
+        <button class="brand-btn" onclick="loadBrandData('Google')">Google</button>
+    </div>
+    <div id="loading-indicator" style="display: none;">正在載入資料...</div>
+    {% endif %}
+
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    {% if not is_static_quote %}
+                    <th>廠牌</th>
+                    {% endif %}
+                    <th>型號</th>
+                    <th>容量</th>
+                    <th>回收價</th>
+
+                    {% if is_admin %}
+                    <th>折扣 (%)</th>
+                    <th>試算價格 (可手動)</th>
+                    <th>操作</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody id="data-table-body">
+                {% if is_static_quote %}
+                {% set show_iphone = iphone_data|length > 0 %}
+                {% set show_android = android_data|length > 0 and not show_iphone %}
+
+                {% for item in iphone_data %}
+                <tr class="data-row type-iphone" {% if not show_iphone %}style="display: none;" {% endif %}
+                    data-brand="{{ item.brand or 'Apple' }}" data-model="{{ item.model }}"
+                    data-capacity="{{ item.capacity }}" data-price="{{ item.price }}">
+                    <td>{{ item.model }}</td>
+                    <td>{{ item.capacity }}</td>
+                    <td class="price" data-price="{{ item.price }}">
+                        {{ item.price }}
+                    </td>
+                </tr>
+                {% endfor %}
+
+                {% for item in android_data %}
+                <tr class="data-row type-android" {% if not show_android %}style="display: none;" {% endif %}
+                    data-brand="{{ item.brand }}" data-model="{{ item.model }}" data-capacity="{{ item.capacity }}"
+                    data-price="{{ item.price }}">
+                    <td>{{ item.model }}</td>
+                    <td>{{ item.capacity }}</td>
+                    <td class="price" data-price="{{ item.price }}">
+                        {{ item.price }}
+                    </td>
+                </tr>
+                {% endfor %}
+
+                {% else %}
+                {% set display_data = iphone_data if type == 'iPhone' or not type else android_data %}
+                {% for item in display_data %}
+                <tr class="data-row" data-brand="{{ item.brand or 'Apple' }}" data-model="{{ item.model }}"
+                    data-capacity="{{ item.capacity }}">
+                    {% if not is_static_quote %}
+                    <td>{{ item.brand or 'Apple' }}</td>
+                    {% endif %}
+                    <td>{{ item.model }}</td>
+                    <td>{{ item.capacity }}</td>
+                    <td class="price" data-price="{{ item.max_price }}">
+                        {{ item.max_price }}
+                        {% if item.diff and item.diff > 0 %}
+                        <span class="diff-up">▲+{{ item.diff }}</span>
+                        {% elif item.diff and item.diff < 0 %} <span class="diff-down">▼{{ item.diff }}</span>
+                            {% endif %}
+                    </td>
+
+                    {% if is_admin %}
+                    <td>
+                        <input type="number" min="0" max="100" class="deduction-input"
+                            style="width: 60px; padding: 5px;" placeholder="%" autocomplete="off">
+                    </td>
+                    <td>
+                        <input type="text" class="final-price-input"
+                            value="{{ item.default_price if item.default_price else item.manual_price if item.manual_price else item.price if item.price else item.final_price if item.final_price else '-' }}"
+                            autocomplete="off">
+                    </td>
+                    <td>
+                        <button class="save-btn" onclick="savePrice(this)"
+                            style="cursor: pointer; border: none; background: none; font-size: 1.2em;"
+                            title="保存價格">💾</button>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    let currentBrand = null;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        initializeCalculations();
+    });
+
+    function switchStaticTab(type) {
+        // Update tabs
+        document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+        const tab = document.getElementById('tab-' + type.toLowerCase());
+        if (tab) tab.classList.add('active');
+
+        // Update rows
+        document.querySelectorAll('.type-iphone').forEach(el => el.style.display = type === 'iPhone' ? '' : 'none');
+        document.querySelectorAll('.type-android').forEach(el => el.style.display = type === 'Android' ? '' : 'none');
+    }
+
+    function initializeCalculations() {
+        const inputs = document.querySelectorAll('.deduction-input');
+        const globalInput = document.getElementById('global-deduction');
+
+        function customRound(price) {
+            const roundOptions = [0, 500, 700];
+            const base = Math.floor(price / 1000) * 1000;
+            let bestPrice = 0;
+            let minDiff = Infinity;
+
+            for (let i = -1; i <= 1; i++) {
+                const currentBase = base + (i * 1000);
+                for (const option of roundOptions) {
+                    const candidate = currentBase + option;
+                    if (candidate < 0) continue;
+                    const diff = Math.abs(price - candidate);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        bestPrice = candidate;
+                    } else if (diff === minDiff) {
+                        bestPrice = Math.max(bestPrice, candidate);
+                    }
+                }
+            }
+            return bestPrice;
+        }
+
+        function calculateRow(input) {
+            const row = input.closest('tr');
+            const priceCell = row.querySelector('.price');
+            const finalPriceInput = row.querySelector('.final-price-input');
+            if (!priceCell || !finalPriceInput) return;
+
+            let priceStr = priceCell.getAttribute('data-price');
+            if (!priceStr) priceStr = priceCell.innerText.split('▲')[0].split('▼')[0].trim();
+
+            const maxPrice = parseInt(priceStr.replace(/[$, ]/g, '').trim());
+            let deduction = parseFloat(input.value);
+            if (isNaN(deduction) || deduction < 0) deduction = 0;
+            if (deduction > 100) deduction = 100;
+
+            if (!isNaN(maxPrice)) {
+                const rawFinal = maxPrice * (1 - deduction / 100);
+                const roundedFinal = customRound(rawFinal);
+                finalPriceInput.value = roundedFinal <= 0 ? '$0' : '$' + roundedFinal.toLocaleString();
+            } else {
+                finalPriceInput.value = '-';
+            }
+        }
+
+        inputs.forEach(input => {
+            input.addEventListener('input', function () {
+                calculateRow(this);
+            });
+        });
+
+        if (globalInput) {
+            globalInput.addEventListener('input', function () {
+                const globalValue = this.value;
+                const deductionInputs = document.querySelectorAll('.deduction-input');
+                deductionInputs.forEach(input => {
+                    input.value = globalValue;
+                    calculateRow(input);
+                });
+            });
+        }
+    }
+
+    function loadBrandData(brand) {
+        currentBrand = brand;
+        const loading = document.getElementById('loading-indicator');
+        const tbody = document.getElementById('data-table-body');
+        const buttons = document.querySelectorAll('.brand-btn');
+
+        // 更新按鈕樣式
+        buttons.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        loading.style.display = 'block';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">載入中...</td></tr>';
+
+        fetch(`/api/get_brand_data/${brand}`)
+            .then(res => res.json())
+            .then(result => {
+                loading.style.display = 'none';
+                if (result.success) {
+                    renderBrandData(result.data, brand);
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: red;">載入失敗: ${result.message}</td></tr>`;
+                }
+            })
+            .catch(err => {
+                loading.style.display = 'none';
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: red;">載入錯誤: ${err.message}</td></tr>`;
+            });
+    }
+
+    function renderBrandData(data, brand) {
+        const tbody = document.getElementById('data-table-body');
+        tbody.innerHTML = '';
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">無資料</td></tr>';
+            return;
+        }
+
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            row.className = 'data-row';
+            row.setAttribute('data-brand', brand);
+            row.setAttribute('data-model', item.model);
+            row.setAttribute('data-capacity', item.capacity);
+
+            const defaultPrice = item.default_price || '-';
+
+            row.innerHTML = `
+                    <td>${brand}</td>
+                    <td>${item.model}</td>
+                    <td>${item.capacity}</td>
+                    <td class="price" data-price="${item.max_price}">${item.max_price}</td>
+                    <td>
+                        <input type="number" min="0" max="100" class="deduction-input"
+                            style="width: 60px; padding: 5px;" placeholder="%" autocomplete="off">
+                    </td>
+                    <td>
+                        <input type="text" class="final-price-input" value="${defaultPrice}" autocomplete="off">
+                    </td>
+                    <td>
+                        <button class="save-btn" onclick="savePrice(this)"
+                            style="cursor: pointer; border: none; background: none; font-size: 1.2em;"
+                            title="保存價格">💾</button>
+                    </td>
+                `;
+            tbody.appendChild(row);
+        });
+
+        initializeCalculations();
+    }
+
+    function savePrice(btn) {
+        const row = btn.closest('tr');
+        const quoteNameInput = document.getElementById('quote-name');
+
+        if (!quoteNameInput || !quoteNameInput.value.startsWith('新增/')) {
+            alert('請先在上方輸入框輸入 "新增/報價單名稱" 指令！');
+            return;
+        }
+
+        const clientName = quoteNameInput.value.substring(3).trim();
+        const brand = row.getAttribute('data-brand');
+        const model = row.getAttribute('data-model');
+        const capacity = row.getAttribute('data-capacity');
+        const finalPriceInput = row.querySelector('.final-price-input');
+        const price = finalPriceInput.value;
+
+        fetch('/update_single_price', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                client_name: clientName,
+                item: {
+                    brand: brand,
+                    model: model,
+                    capacity: capacity,
+                    price: price
+                }
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('單筆保存成功！');
+                    const originalText = btn.innerText;
+                    btn.innerText = '✅';
+                    setTimeout(() => btn.innerText = originalText, 2000);
+                } else {
+                    alert('保存失敗: ' + (data.message || '未知錯誤'));
+                }
+            });
+    }
+
+    function handleCommand() {
+        const command = document.getElementById('quote-name').value.trim();
+        if (!command) return;
+
+        if (command === 'admintim') {
+            // Fetch admin path from backend
+            fetch('/get_admin_path')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = `/${data.admin_path}`;
+                    } else {
+                        alert('Failed to get admin path: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(err => {
+                    alert('Error: ' + err.message);
+                });
+            return;
+        }
+
+        const rows = document.querySelectorAll('.data-row');
+        const items = [];
+
+        rows.forEach(row => {
+            const finalPriceInput = row.querySelector('.final-price-input');
+            const price = finalPriceInput.value;
+
+            if (price && price !== '-') {
+                items.push({
+                    brand: row.getAttribute('data-brand'),
+                    model: row.getAttribute('data-model'),
+                    capacity: row.getAttribute('data-capacity'),
+                    price: price
+                });
+            }
+        });
+
+        if (command.startsWith('刪除/')) {
+            const clientName = command.substring(3).trim();
+            if (!confirm(`確定要刪除報價單:${clientName} 嗎?此操作不可逆!`)) return;
+
+            fetch('/delete_quote', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ client_name: clientName })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.message || '刪除失敗');
+                });
+            return;
+        }
+
+        if (command.startsWith('新增/')) {
+            const clientName = command.substring(3).trim();
+
+            fetch('/generate_quote', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    client_name: clientName,
+                    items: items
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(`報價單 [${data.original_name}] 已更新!`);
+                        window.open(data.link, '_blank');
+                    } else {
+                        alert('生成/更新失敗: ' + (data.message || '未知錯誤'));
+                    }
+                });
+            return;
+        }
+
+        const clientName = command;
+        fetch('/check_quote_exists', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: clientName })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.exists) {
+                    alert(`報價單 [${clientName}] 存在!`);
+                    window.open(data.link, '_blank');
+                } else {
+                    alert(`報價單 [${clientName}] 不存在。請使用 "新增/${clientName}" 建立。`);
+                }
+            });
+    }
+
+    function generatePDF() {
+        const dateDiv = document.getElementById('generation-date');
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('zh-TW', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        dateDiv.innerHTML = '<div class="generation-date-display">生成日期：' + dateStr + '</div>';
+        dateDiv.style.display = 'block';
+
+        const element = document.querySelector('.container');
+        const opt = {
+            margin: 10,
+            filename: '報價單_' + document.querySelector('h1').textContent + '_' + now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0') + '.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save().then(function () {
+            setTimeout(function () {
+                dateDiv.style.display = 'none';
+            }, 1000);
+        });
+    }
+
+    function shareToLine() {
+        const currentUrl = window.location.href;
+        const clientName = document.querySelector('h1').textContent;
+        const message = clientName + '\n' + currentUrl;
+        const lineUrl = 'https://line.me/R/msg/text/?' + encodeURIComponent(message);
+        window.open(lineUrl, '_blank');
+    }
+</script>
+</body>
+
+</html>

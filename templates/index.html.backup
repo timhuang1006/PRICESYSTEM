@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>二手機回收價 - {% if type %}{{ type }}{% else %}後台管理{% endif %}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            padding-bottom: 100px;
+            /* LINE Browser Fix */
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .nav-link {
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #555;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-weight: bold;
+        }
+
+        .nav-link.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .brand-filters {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .brand-btn {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            background: #f8f9fa;
+            cursor: pointer;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        .brand-btn:hover,
+        .brand-btn.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .price {
+            color: #333;
+            font-weight: bold;
+        }
+
+        .diff-up {
+            color: green;
+            font-size: 0.9em;
+            margin-left: 8px;
+        }
+
+        .diff-down {
+            color: red;
+            font-size: 0.9em;
+            margin-left: 8px;
+        }
+
+        .final-price-input {
+            width: 80px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        /* Mobile RWD */
+        input {
+            font-size: 16px !important;
+
+            /* iOS Zoom Fix */
+            /* 針對報價單頁面 */
+                {
+                % if is_static_quote %
+            }
+
+            text-align: right;
+
+                {
+                % endif %
+            }
+        }
+
+        /* 隱藏管理功能區 */
+            {
+            % if is_static_quote %
+        }
+
+        .controls,
+        .deduction-input,
+        .save-btn {
+            display: none !important;
+        }
+
+            {
+            % endif %
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                padding-bottom: 120px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-group {
+                justify-content: space-between;
+            }
+
+            /* Hide less important columns on mobile */
+            th:nth-child(1),
+            td:nth-child(1) {
+                /* Brand */
+                display: none;
+            }
+
+            th,
+            td {
+                padding: 8px 4px;
+                font-size: 14px;
+            }
+
+            .final-price-input {
+                width: 70px;
+            }
+
+            .deduction-input {
+                width: 40px !important;
+            }
+
+            .save-btn {
+                font-size: 1.5em !important;
+                padding: 10px !important;
+                /* Larger touch target */
+                width: 44px;
+                height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>二手機回收價報價系統</h1>
+
+        <!-- 修正 BuildError: 連結到根路由，並使用 GET 參數控制頁籤 -->
+        <div class="nav-tabs">
+            <a href="{{ url_for('index', type='iPhone') }}"
+                class="nav-link {% if type == 'iPhone' or not type %}active{% endif %}">iPhone</a>
+            <a href="{{ url_for('index', type='Android') }}"
+                class="nav-link {% if type == 'Android' %}active{% endif %}">Android</a>
+        </div>
+
+        <div class="controls">
+            <!-- 確保只有在管理員模式下才顯示控制項 -->
+            {% if is_admin %}
+            <div class="action-group">
+                <label for="global-deduction">一鍵扣%：</label>
+                <input type="number" id="global-deduction" placeholder="%" style="width: 60px; padding: 5px;"
+                    autocomplete="off">
+            </div>
+
+            <div class="action-group">
+                <input type="text" id="quote-name" placeholder="報價單名稱 / 指令" style="padding: 5px;" autocomplete="off">
+                <button onclick="handleCommand()" style="padding: 5px 10px; cursor: pointer;">執行</button>
+            </div>
+            {% endif %}
+
+            {% if type == 'Android' %}
+            <!-- 這裡需要 Android 的篩選邏輯，但目前 app.py 缺乏獲取 brands 的邏輯 -->
+            <!-- 暫時隱藏或使用 placeholder 邏輯 -->
+            {% endif %}
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>廠牌</th>
+                        <th>型號</th>
+                        <th>容量</th>
+                        <th>回收價</th>
+
+                        {% if is_admin %}
+                        <th>折扣 (%)</th>
+                        <th>試算價格 (可手動)</th>
+                        <th>操作</th>
+                        {% else %}
+                        <th>最終報價</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 根據 type 或 is_static_quote 決定顯示哪個數據 -->
+                    {% set display_data = iphone_data if type == 'iPhone' or is_static_quote and iphone_data is defined
+                    else android_data %}
+
+                    {% for item in display_data %}
+                    <tr class="data-row" data-brand="{{ item.brand or 'Apple' }}" data-model="{{ item.model }}"
+                        data-capacity="{{ item.capacity }}">
+                        <td>{{ item.brand or 'Apple' }}</td>
+                        <td>{{ item.model }}</td>
+                        <td>{{ item.capacity }}</td>
+                        <td class="price" data-price="{{ item.max_price }}">
+                            <!-- 如果是報價單頁面，直接顯示最終價格 -->
+                            {% if is_static_quote %}
+                            {{ item.final_price or item.price }}
+                            {% else %}
+                            <!-- 管理頁面顯示原始價格 -->
+                            {{ item.max_price }}
+                            {% if item.diff and item.diff > 0 %}
+                            <span class="diff-up">▲+{{ item.diff }}</span>
+                            {% elif item.diff and item.diff < 0 %} <span class="diff-down">▼{{ item.diff }}</span>
+                                {% endif %}
+                                {% endif %}
+                        </td>
+
+                        {% if is_admin %}
+                        <!-- 管理員操作區 -->
+                        <td>
+                            <input type="number" min="0" max="100" class="deduction-input"
+                                style="width: 60px; padding: 5px;" placeholder="%" autocomplete="off">
+                        </td>
+                        <td>
+                            <input type="text" class="final-price-input"
+                                value="{{ item.manual_price if item.manual_price else item.price if item.price else item.final_price if item.final_price else '-' }}"
+                                autocomplete="off">
+                        </td>
+                        <td>
+                            <button class="save-btn" onclick="savePrice(this)"
+                                style="cursor: pointer; border: none; background: none; font-size: 1.2em;"
+                                title="保存價格">💾</button>
+                        </td>
+                        {% elif is_static_quote %}
+                        <!-- 靜態報價單最終價格 -->
+                        <td>
+                            {{ item.final_price or item.price }}
+                        </td>
+                        {% endif %}
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+                // 確保數字是 100 的倍數，且百位數是 0, 5, 7 的邏輯
+                const roundOptions = [0, 500, 700];
+                const base = Math.floor(price / 1000) * 1000;
+
+                let bestPrice = 0;
+                let minDiff = Infinity;
+
+                for (let i = -1; i <= 1; i++) { // 檢查當前千位數、前一個千位數和下一個千位數 const currentBase=base + (i * 1000); for (const
+                    option of roundOptions) { const candidate=currentBase + option; if (candidate < 0) continue; const
+                    diff=Math.abs(price - candidate); if (diff < minDiff) { minDiff=diff; bestPrice=candidate; } else if
+                    (diff===minDiff) { // 平手時，選擇較大值（確保捨入方向是向上） bestPrice=Math.max(bestPrice, candidate); } } } return
+                    bestPrice; } // Function to calculate price for a row function calculateRow(input) { const
+                    row=input.closest('tr'); const priceCell=row.querySelector('.price'); const
+                    finalPriceInput=row.querySelector('.final-price-input'); if (!priceCell || !finalPriceInput) return;
+                    // Get raw price string let priceStr=priceCell.getAttribute('data-price'); if (!priceStr)
+                    priceStr=priceCell.innerText.split('▲')[0].split('▼')[0].trim(); // Parse price to number const
+                    maxPrice=parseInt(priceStr.replace(/[$, ]/g, '' ).trim()); // Get deduction percentage let
+                    deduction=parseFloat(input.value); if (isNaN(deduction) || deduction < 0) deduction=0; if
+                    (deduction> 100) deduction = 100;
+
+                    // Calculate final price
+                    if (!isNaN(maxPrice)) {
+                    const rawFinal = maxPrice * (1 - deduction / 100);
+                    const roundedFinal = customRound(rawFinal);
+
+                    // 格式化顯示，並將負數/零顯示為 $0
+                    finalPriceInput.value = roundedFinal <= 0 ? '$0' : '$' + roundedFinal.toLocaleString(); } else {
+                        finalPriceInput.value='-' ; } } // Listen for individual inputs inputs.forEach(input=> {
+                        input.addEventListener('input', function () {
+                        calculateRow(this);
+                        });
+                        // 初次載入時根據初始折扣計算一次
+                        if (input.value) {
+                        calculateRow(input);
+                        }
+                        });
+
+                        // Listen for global input
+                        if (globalInput) {
+                        globalInput.addEventListener('input', function () {
+                        const globalValue = this.value;
+                        inputs.forEach(input => {
+                        input.value = globalValue;
+                        calculateRow(input);
+                        });
+                        });
+                        }
+                        }
+                        });
+
+                        // 儲存單一價格
+                        function savePrice(btn) {
+                        const row = btn.closest('tr');
+                        const quoteNameInput = document.getElementById('quote-name');
+
+                        if (!quoteNameInput || !quoteNameInput.value.startsWith('新增/')) {
+                        alert('請先在上方輸入框輸入 "新增/報價單名稱" 指令！');
+                        return;
+                        }
+
+                        const clientName = quoteNameInput.value.substring(3).trim(); // 提取名稱
+
+                        const brand = row.getAttribute('data-brand');
+                        const model = row.getAttribute('data-model');
+                        const capacity = row.getAttribute('data-capacity');
+                        const finalPriceInput = row.querySelector('.final-price-input');
+                        const price = finalPriceInput.value;
+
+                        fetch('/update_single_price', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                        client_name: clientName, // 使用 client_name 而不是 quote_name
+                        item: {
+                        brand: brand,
+                        model: model,
+                        capacity: capacity,
+                        price: price // 價格可能包含 '$' 和 ','，後端會處理
+                        }
+                        })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                        if (data.success) {
+                        const link = data.link ? `<a href="${data.link}" target="_blank">點擊查看報價單</a>` : '保存成功';
+                        alert(`單筆保存成功！${link}`);
+                        // Visual feedback
+                        const originalText = btn.innerText;
+                        btn.innerText = '✅';
+                        setTimeout(() => btn.innerText = originalText, 2000);
+                        } else {
+                        alert('保存失敗: ' + (data.message || '未知錯誤'));
+                        }
+                        });
+                        }
+
+                        // 處理指令 (查詢/新增/刪除/admin)
+                        function handleCommand() {
+                        const command = document.getElementById('quote-name').value.trim();
+                        if (!command) return;
+
+                        // 1. 隱藏後台指令 (admintim)
+                        if (command === 'admintim') {
+                        // 由於您要新增 /admin_dashboard 路由，這裡前端直接重導向
+                        window.location.href = '/admin_dashboard';
+                        return;
+                        }
+
+                        const rows = document.querySelectorAll('.data-row');
+                        const items = [];
+
+                        // 提取所有價格數據
+                        rows.forEach(row => {
+                        const finalPriceInput = row.querySelector('.final-price-input');
+                        const price = finalPriceInput.value;
+
+                        // 必須有價格，且價格不是初始狀態 '-'
+                        if (price && price !== '-') {
+                        items.push({
+                        brand: row.getAttribute('data-brand'),
+                        model: row.getAttribute('data-model'),
+                        capacity: row.getAttribute('data-capacity'),
+                        price: price // 使用 price，與後端 update_single_price 保持一致
+                        });
+                        }
+                        });
+
+                        // 2. 刪除指令 (刪除/名稱)
+                        if (command.startsWith('刪除/')) {
+                        const clientName = command.substring(3).trim();
+                        // 提醒：alert() 應改為自定義 modal UI，但這裡暫用 alert 保持功能
+                        if (!confirm(`確定要刪除報價單：${clientName} 嗎？此操作不可逆！`)) return;
+
+                        // 呼叫後端刪除 API (假設為 /delete_quote，這是未來要實現的)
+                        fetch('/delete_quote', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ client_name: clientName })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                        alert(data.message || '刪除失敗');
+                        });
+                        return;
+                        }
+
+                        // 3. 新增/更新指令 (新增/名稱)
+                        if (command.startsWith('新增/')) {
+                        const clientName = command.substring(3).trim();
+
+                        fetch('/generate_quote', {
+                        method: 'POST',
+                        headers: {
+                        'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                        client_name: clientName, // 使用 client_name
+                        items: items // 傳遞完整的數據列表
+                        }),
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                        if (data.success) {
+                        alert(`報價單 [${data.original_name}] 已更新！`);
+                        window.open(data.link, '_blank'); // 打開短網址
+                        } else {
+                        alert('生成/更新失敗: ' + (data.message || '未知錯誤'));
+                        }
+                        });
+                        return;
+                        }
+
+                        // 4. 查詢指令 (純名稱)
+                        const clientName = command;
+                        fetch('/check_quote_exists', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: clientName })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                        if (data.exists) {
+                        alert(`報價單 [${clientName}] 存在！`);
+                        window.open(data.link, '_blank'); // 打開短網址
+                        } else {
+                        alert(`報價單 [${clientName}] 不存在。請使用 "新增/${clientName}" 建立。`);
+                        }
+                        });
+                        }
+                        </script>
+</body>
+
+</html>

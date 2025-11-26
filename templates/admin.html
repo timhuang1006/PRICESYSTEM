@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理後台</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        .link {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>已建立的報價單</h1>
+        <ul>
+            {% for quote in quotes %}
+            <li>
+                <a href="/static_quotes/{{ quote }}/index.html" class="link" target="_blank">{{ quote }}</a>
+                <button class="delete-btn" onclick="deleteQuote('{{ quote }}')">刪除</button>
+            </li>
+            {% else %}
+            <li style="justify-content: center; color: #777;">目前沒有報價單</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <script>
+        function deleteQuote(name) {
+            if (confirm('確定要刪除 ' + name + ' 嗎？')) {
+                fetch('/delete_quote/' + name, {
+                    method: 'POST'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert('刪除失敗');
+                        }
+                    });
+            }
+        }
+    </script>
+</body>
+
+</html>

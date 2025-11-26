@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ quote_name }} - 報價單</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .final-price {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .filter-controls {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            margin: 0 5px;
+            border: 1px solid #007bff;
+            background-color: white;
+            color: #007bff;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .filter-btn.active {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>{{ quote_name }} 報價單</h1>
+
+        <div class="filter-controls">
+            <button class="filter-btn active" onclick="filterData('all')">全部</button>
+            <button class="filter-btn" onclick="filterData('Apple')">iPhone</button>
+            <button class="filter-btn" onclick="filterData('Android')">Android</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>廠牌</th>
+                    <th>型號</th>
+                    <th>容量</th>
+                    <th>回收價</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr class="data-row" data-brand="{{ item.brand }}">
+                    <td>{{ item.brand }}</td>
+                    <td>{{ item.model }}</td>
+                    <td>{{ item.capacity }}</td>
+                    <td class="final-price">{{ item.final_price }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function filterData(type) {
+            const rows = document.querySelectorAll('.data-row');
+            const buttons = document.querySelectorAll('.filter-btn');
+
+            // Update buttons
+            buttons.forEach(btn => {
+                if (btn.innerText === (type === 'all' ? '全部' : (type === 'Apple' ? 'iPhone' : 'Android'))) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            rows.forEach(row => {
+                const brand = row.getAttribute('data-brand');
+                if (type === 'all') {
+                    row.style.display = '';
+                } else if (type === 'Apple') {
+                    if (brand === 'Apple') row.style.display = '';
+                    else row.style.display = 'none';
+                } else if (type === 'Android') {
+                    if (brand !== 'Apple') row.style.display = '';
+                    else row.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

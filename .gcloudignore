@@ -1,0 +1,9 @@
+# 確保部署時不覆蓋 static_quotes 目錄
+static_quotes/
+*.db
+__pycache__/
+*.pyc
+venv/
+.env
+admin_config.json
+cache/

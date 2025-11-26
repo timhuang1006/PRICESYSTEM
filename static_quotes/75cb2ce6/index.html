@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>二手機回收價 - 後台管理</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .nav-link {
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #555;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-weight: bold;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .nav-link.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .brand-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+
+        .brand-btn {
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .brand-btn:hover {
+            background: #0056b3;
+        }
+
+        .brand-btn.active {
+            background: #28a745;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .price {
+            color: #333;
+            font-weight: bold;
+        }
+
+        .diff-up {
+            color: green;
+            font-size: 0.9em;
+            margin-left: 8px;
+        }
+
+        .diff-down {
+            color: red;
+            font-size: 0.9em;
+            margin-left: 8px;
+        }
+
+        .final-price-input {
+            width: 80px;
+            padding: 5px;
+        }
+
+        .deduction-input {
+            width: 60px;
+        }
+
+        .save-btn {
+            font-size: 1.2em;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        #loading-indicator {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1em;
+            color: #007bff;
+        }
+
+        .quote-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .pdf-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .pdf-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .line-btn {
+            background: linear-gradient(135deg, #06c755 0%, #00b900 100%);
+            color: white;
+        }
+
+        .line-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(6, 199, 85, 0.3);
+        }
+
+        .generation-date-display {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        @media print {
+            .quote-actions {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        
+        <h1>測試客戶_1764161497 報價單</h1>
+        
+
+        
+
+        <div class="controls">
+            
+        </div>
+
+        
+        <div class="quote-actions">
+            <button onclick="generatePDF()" class="action-btn pdf-btn">📄 生成PDF</button>
+            <button onclick="shareToLine()" class="action-btn line-btn">💬 傳送到LINE</button>
+        </div>
+        <div id="generation-date" style="display: none;"></div>
+        
+
+        
+
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        
+                        <th>型號</th>
+                        <th>容量</th>
+                        <th>回收價</th>
+
+                        
+                    </tr>
+                </thead>
+                <tbody id="data-table-body">
+                    
+                    
+                    
+
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 17 Pro Max"
+                        data-capacity="1TB" data-price="$59,000">
+                        <td>iPhone 17 Pro Max</td>
+                        <td>1TB</td>
+                        <td class="price" data-price="$59,000">
+                            $59,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 17 Pro Max"
+                        data-capacity="512GB" data-price="$52,000">
+                        <td>iPhone 17 Pro Max</td>
+                        <td>512GB</td>
+                        <td class="price" data-price="$52,000">
+                            $52,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 17 Pro Max"
+                        data-capacity="256GB" data-price="$46,000">
+                        <td>iPhone 17 Pro Max</td>
+                        <td>256GB</td>
+                        <td class="price" data-price="$46,000">
+                            $46,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 17 Pro"
+                        data-capacity="1TB" data-price="$52,000">
+                        <td>iPhone 17 Pro</td>
+                        <td>1TB</td>
+                        <td class="price" data-price="$52,000">
+                            $52,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 17 Pro"
+                        data-capacity="512GB" data-price="$45,000">
+                        <td>iPhone 17 Pro</td>
+                        <td>512GB</td>
+                        <td class="price" data-price="$45,000">
+                            $45,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 17 Pro"
+                        data-capacity="256GB" data-price="$38,000">
+                        <td>iPhone 17 Pro</td>
+                        <td>256GB</td>
+                        <td class="price" data-price="$38,000">
+                            $38,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 17 Pro"
+                        data-capacity="128GB" data-price="$34,000">
+                        <td>iPhone 17 Pro</td>
+                        <td>128GB</td>
+                        <td class="price" data-price="$34,000">
+                            $34,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 17 Plus"
+                        data-capacity="512GB" data-price="$39,000">
+                        <td>iPhone 17 Plus</td>
+                        <td>512GB</td>
+                        <td class="price" data-price="$39,000">
+                            $39,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 17 Plus"
+                        data-capacity="256GB" data-price="$33,000">
+                        <td>iPhone 17 Plus</td>
+                        <td>256GB</td>
+                        <td class="price" data-price="$33,000">
+                            $33,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 17 Plus"
+                        data-capacity="128GB" data-price="$30,000">
+                        <td>iPhone 17 Plus</td>
+                        <td>128GB</td>
+                        <td class="price" data-price="$30,000">
+                            $30,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 17"
+                        data-capacity="512GB" data-price="$35,000">
+                        <td>iPhone 17</td>
+                        <td>512GB</td>
+                        <td class="price" data-price="$35,000">
+                            $35,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 17"
+                        data-capacity="256GB" data-price="$29,000">
+                        <td>iPhone 17</td>
+                        <td>256GB</td>
+                        <td class="price" data-price="$29,000">
+                            $29,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 17"
+                        data-capacity="128GB" data-price="$26,000">
+                        <td>iPhone 17</td>
+                        <td>128GB</td>
+                        <td class="price" data-price="$26,000">
+                            $26,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 16e"
+                        data-capacity="128G" data-price="$12,500">
+                        <td>iPhone 16e</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$12,500">
+                            $12,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 16e"
+                        data-capacity="256G" data-price="$14,000">
+                        <td>iPhone 16e</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$14,000">
+                            $14,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 16e"
+                        data-capacity="512G" data-price="$16,000">
+                        <td>iPhone 16e</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$16,000">
+                            $16,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 16 Pro Max"
+                        data-capacity="256G" data-price="$24,700">
+                        <td>iPhone 16 Pro Max</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$24,700">
+                            $24,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 16 Pro Max"
+                        data-capacity="512G" data-price="$27,500">
+                        <td>iPhone 16 Pro Max</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$27,500">
+                            $27,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 16 Pro Max"
+                        data-capacity="1T" data-price="$31,000">
+                        <td>iPhone 16 Pro Max</td>
+                        <td>1T</td>
+                        <td class="price" data-price="$31,000">
+                            $31,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 16 Pro"
+                        data-capacity="128G" data-price="$20,000">
+                        <td>iPhone 16 Pro</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$20,000">
+                            $20,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 16 Pro"
+                        data-capacity="256G" data-price="$21,700">
+                        <td>iPhone 16 Pro</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$21,700">
+                            $21,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 16 Pro"
+                        data-capacity="512G" data-price="$24,700">
+                        <td>iPhone 16 Pro</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$24,700">
+                            $24,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 16 Pro"
+                        data-capacity="1T" data-price="$26,000">
+                        <td>iPhone 16 Pro</td>
+                        <td>1T</td>
+                        <td class="price" data-price="$26,000">
+                            $26,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 16 Plus"
+                        data-capacity="128G" data-price="$17,500">
+                        <td>iPhone 16 Plus</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$17,500">
+                            $17,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 16 Plus"
+                        data-capacity="256G" data-price="$18,500">
+                        <td>iPhone 16 Plus</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$18,500">
+                            $18,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 16 Plus"
+                        data-capacity="512G" data-price="$20,700">
+                        <td>iPhone 16 Plus</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$20,700">
+                            $20,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 16"
+                        data-capacity="128G" data-price="$15,000">
+                        <td>iPhone 16</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$15,000">
+                            $15,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 16"
+                        data-capacity="256G" data-price="$16,500">
+                        <td>iPhone 16</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$16,500">
+                            $16,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 16"
+                        data-capacity="512G" data-price="$19,000">
+                        <td>iPhone 16</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$19,000">
+                            $19,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 15 Pro Max"
+                        data-capacity="256G" data-price="$18,700">
+                        <td>iPhone 15 Pro Max</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$18,700">
+                            $18,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 15 Pro Max"
+                        data-capacity="512G" data-price="$20,700">
+                        <td>iPhone 15 Pro Max</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$20,700">
+                            $20,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 15 Pro Max"
+                        data-capacity="1T" data-price="$23,000">
+                        <td>iPhone 15 Pro Max</td>
+                        <td>1T</td>
+                        <td class="price" data-price="$23,000">
+                            $23,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 15 Pro"
+                        data-capacity="128G" data-price="$14,700">
+                        <td>iPhone 15 Pro</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$14,700">
+                            $14,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 15 Pro"
+                        data-capacity="256G" data-price="$16,500">
+                        <td>iPhone 15 Pro</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$16,500">
+                            $16,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 15 Pro"
+                        data-capacity="512G" data-price="$18,000">
+                        <td>iPhone 15 Pro</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$18,000">
+                            $18,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 15 Pro"
+                        data-capacity="1T" data-price="$19,500">
+                        <td>iPhone 15 Pro</td>
+                        <td>1T</td>
+                        <td class="price" data-price="$19,500">
+                            $19,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 15 Plus"
+                        data-capacity="128G" data-price="$12,000">
+                        <td>iPhone 15 Plus</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$12,000">
+                            $12,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 15 Plus"
+                        data-capacity="256G" data-price="$13,000">
+                        <td>iPhone 15 Plus</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$13,000">
+                            $13,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 15 Plus"
+                        data-capacity="512G" data-price="$14,000">
+                        <td>iPhone 15 Plus</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$14,000">
+                            $14,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 15"
+                        data-capacity="128G" data-price="$11,500">
+                        <td>iPhone 15</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$11,500">
+                            $11,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 15"
+                        data-capacity="256G" data-price="$12,700">
+                        <td>iPhone 15</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$12,700">
+                            $12,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 15"
+                        data-capacity="512G" data-price="$13,700">
+                        <td>iPhone 15</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$13,700">
+                            $13,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 14 Plus"
+                        data-capacity="128G" data-price="$9,000">
+                        <td>iPhone 14 Plus</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$9,000">
+                            $9,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 14 Plus"
+                        data-capacity="256G" data-price="$9,700">
+                        <td>iPhone 14 Plus</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$9,700">
+                            $9,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 14 Plus"
+                        data-capacity="512G" data-price="$10,500">
+                        <td>iPhone 14 Plus</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$10,500">
+                            $10,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 14 Pro"
+                        data-capacity="128G" data-price="$10,500">
+                        <td>iPhone 14 Pro</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$10,500">
+                            $10,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 14 Pro"
+                        data-capacity="256G" data-price="$11,000">
+                        <td>iPhone 14 Pro</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$11,000">
+                            $11,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 14 Pro"
+                        data-capacity="512G" data-price="$12,000">
+                        <td>iPhone 14 Pro</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$12,000">
+                            $12,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 14 Pro"
+                        data-capacity="1T" data-price="$13,000">
+                        <td>iPhone 14 Pro</td>
+                        <td>1T</td>
+                        <td class="price" data-price="$13,000">
+                            $13,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 14 Pro Max"
+                        data-capacity="128G" data-price="$14,000">
+                        <td>iPhone 14 Pro Max</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$14,000">
+                            $14,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 14 Pro Max"
+                        data-capacity="256G" data-price="$14,700">
+                        <td>iPhone 14 Pro Max</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$14,700">
+                            $14,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 14 Pro Max"
+                        data-capacity="512G" data-price="$15,500">
+                        <td>iPhone 14 Pro Max</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$15,500">
+                            $15,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 14 Pro Max"
+                        data-capacity="1T" data-price="$16,500">
+                        <td>iPhone 14 Pro Max</td>
+                        <td>1T</td>
+                        <td class="price" data-price="$16,500">
+                            $16,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 14"
+                        data-capacity="128G" data-price="$7,700">
+                        <td>iPhone 14</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$7,700">
+                            $7,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 14"
+                        data-capacity="256G" data-price="$8,500">
+                        <td>iPhone 14</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$8,500">
+                            $8,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 14"
+                        data-capacity="512G" data-price="$9,500">
+                        <td>iPhone 14</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$9,500">
+                            $9,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone SE3"
+                        data-capacity="64G" data-price="$3,000">
+                        <td>iPhone SE3</td>
+                        <td>64G</td>
+                        <td class="price" data-price="$3,000">
+                            $3,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone SE3"
+                        data-capacity="128G" data-price="$3,700">
+                        <td>iPhone SE3</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$3,700">
+                            $3,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone SE3"
+                        data-capacity="256G" data-price="$4,000">
+                        <td>iPhone SE3</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$4,000">
+                            $4,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 13 Pro Max"
+                        data-capacity="128G" data-price="$9,500">
+                        <td>iPhone 13 Pro Max</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$9,500">
+                            $9,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 13 Pro Max"
+                        data-capacity="256G" data-price="$10,500">
+                        <td>iPhone 13 Pro Max</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$10,500">
+                            $10,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 13 Pro Max"
+                        data-capacity="512G" data-price="$11,500">
+                        <td>iPhone 13 Pro Max</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$11,500">
+                            $11,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 13 Pro Max"
+                        data-capacity="1T" data-price="$12,000">
+                        <td>iPhone 13 Pro Max</td>
+                        <td>1T</td>
+                        <td class="price" data-price="$12,000">
+                            $12,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 13 Pro"
+                        data-capacity="128G" data-price="$7,700">
+                        <td>iPhone 13 Pro</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$7,700">
+                            $7,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 13 Pro"
+                        data-capacity="256G" data-price="$8,500">
+                        <td>iPhone 13 Pro</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$8,500">
+                            $8,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 13 Pro"
+                        data-capacity="512G" data-price="$9,000">
+                        <td>iPhone 13 Pro</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$9,000">
+                            $9,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 13 Pro"
+                        data-capacity="1T" data-price="$9,700">
+                        <td>iPhone 13 Pro</td>
+                        <td>1T</td>
+                        <td class="price" data-price="$9,700">
+                            $9,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 13"
+                        data-capacity="128G" data-price="$5,700">
+                        <td>iPhone 13</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$5,700">
+                            $5,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 13"
+                        data-capacity="256G" data-price="$6,700">
+                        <td>iPhone 13</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$6,700">
+                            $6,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 13"
+                        data-capacity="512G" data-price="$7,000">
+                        <td>iPhone 13</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$7,000">
+                            $7,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 13 mini"
+                        data-capacity="128G" data-price="$5,500">
+                        <td>iPhone 13 mini</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$5,500">
+                            $5,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 13 mini"
+                        data-capacity="256G" data-price="$6,000">
+                        <td>iPhone 13 mini</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$6,000">
+                            $6,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 13 mini"
+                        data-capacity="512G" data-price="$6,500">
+                        <td>iPhone 13 mini</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$6,500">
+                            $6,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 12 Pro Max"
+                        data-capacity="128G" data-price="$7,000">
+                        <td>iPhone 12 Pro Max</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$7,000">
+                            $7,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 12 Pro Max"
+                        data-capacity="256G" data-price="$7,700">
+                        <td>iPhone 12 Pro Max</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$7,700">
+                            $7,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 12 Pro Max"
+                        data-capacity="512G" data-price="$8,000">
+                        <td>iPhone 12 Pro Max</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$8,000">
+                            $8,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 12 mini"
+                        data-capacity="64G" data-price="$3,000">
+                        <td>iPhone 12 mini</td>
+                        <td>64G</td>
+                        <td class="price" data-price="$3,000">
+                            $3,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 12 mini"
+                        data-capacity="128G" data-price="$3,500">
+                        <td>iPhone 12 mini</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$3,500">
+                            $3,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 12 mini"
+                        data-capacity="256G" data-price="$3,700">
+                        <td>iPhone 12 mini</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$3,700">
+                            $3,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 12 Pro"
+                        data-capacity="128G" data-price="$5,000">
+                        <td>iPhone 12 Pro</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$5,000">
+                            $5,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 12 Pro"
+                        data-capacity="256G" data-price="$5,700">
+                        <td>iPhone 12 Pro</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$5,700">
+                            $5,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 12 Pro"
+                        data-capacity="512G" data-price="$6,000">
+                        <td>iPhone 12 Pro</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$6,000">
+                            $6,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 12"
+                        data-capacity="64G" data-price="$3,700">
+                        <td>iPhone 12</td>
+                        <td>64G</td>
+                        <td class="price" data-price="$3,700">
+                            $3,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 12"
+                        data-capacity="128G" data-price="$4,000">
+                        <td>iPhone 12</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$4,000">
+                            $4,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 12"
+                        data-capacity="256G" data-price="$4,500">
+                        <td>iPhone 12</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$4,500">
+                            $4,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone SE2"
+                        data-capacity="64G" data-price="$1,700">
+                        <td>iPhone SE2</td>
+                        <td>64G</td>
+                        <td class="price" data-price="$1,700">
+                            $1,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone SE2"
+                        data-capacity="128G" data-price="$2,000">
+                        <td>iPhone SE2</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$2,000">
+                            $2,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone SE2"
+                        data-capacity="256G" data-price="$2,000">
+                        <td>iPhone SE2</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$2,000">
+                            $2,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 11 ProMax"
+                        data-capacity="64G" data-price="$4,000">
+                        <td>iPhone 11 ProMax</td>
+                        <td>64G</td>
+                        <td class="price" data-price="$4,000">
+                            $4,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 11 ProMax"
+                        data-capacity="256G" data-price="$4,500">
+                        <td>iPhone 11 ProMax</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$4,500">
+                            $4,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 11 ProMax"
+                        data-capacity="512G" data-price="$5,000">
+                        <td>iPhone 11 ProMax</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$5,000">
+                            $5,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 11 Pro"
+                        data-capacity="64G" data-price="$3,500">
+                        <td>iPhone 11 Pro</td>
+                        <td>64G</td>
+                        <td class="price" data-price="$3,500">
+                            $3,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 11 Pro"
+                        data-capacity="256G" data-price="$4,000">
+                        <td>iPhone 11 Pro</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$4,000">
+                            $4,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 11 Pro"
+                        data-capacity="512G" data-price="$4,500">
+                        <td>iPhone 11 Pro</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$4,500">
+                            $4,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 11"
+                        data-capacity="64G" data-price="$3,000">
+                        <td>iPhone 11</td>
+                        <td>64G</td>
+                        <td class="price" data-price="$3,000">
+                            $3,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 11"
+                        data-capacity="128G" data-price="$3,500">
+                        <td>iPhone 11</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$3,500">
+                            $3,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 11"
+                        data-capacity="256G" data-price="$3,700">
+                        <td>iPhone 11</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$3,700">
+                            $3,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone XR"
+                        data-capacity="64G" data-price="$2,000">
+                        <td>iPhone XR</td>
+                        <td>64G</td>
+                        <td class="price" data-price="$2,000">
+                            $2,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone XR"
+                        data-capacity="128G" data-price="$2,500">
+                        <td>iPhone XR</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$2,500">
+                            $2,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone XR"
+                        data-capacity="256G" data-price="$3,000">
+                        <td>iPhone XR</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$3,000">
+                            $3,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone Xs Max"
+                        data-capacity="64G" data-price="$2,700">
+                        <td>iPhone Xs Max</td>
+                        <td>64G</td>
+                        <td class="price" data-price="$2,700">
+                            $2,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone Xs Max"
+                        data-capacity="256G" data-price="$3,000">
+                        <td>iPhone Xs Max</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$3,000">
+                            $3,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone Xs Max"
+                        data-capacity="512G" data-price="$3,500">
+                        <td>iPhone Xs Max</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$3,500">
+                            $3,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone Xs"
+                        data-capacity="64G" data-price="$1,700">
+                        <td>iPhone Xs</td>
+                        <td>64G</td>
+                        <td class="price" data-price="$1,700">
+                            $1,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone Xs"
+                        data-capacity="256G" data-price="$2,000">
+                        <td>iPhone Xs</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$2,000">
+                            $2,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone Xs"
+                        data-capacity="512G" data-price="$2,500">
+                        <td>iPhone Xs</td>
+                        <td>512G</td>
+                        <td class="price" data-price="$2,500">
+                            $2,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone X"
+                        data-capacity="64G" data-price="$1,700">
+                        <td>iPhone X</td>
+                        <td>64G</td>
+                        <td class="price" data-price="$1,700">
+                            $1,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone X"
+                        data-capacity="256G" data-price="$2,000">
+                        <td>iPhone X</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$2,000">
+                            $2,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 8+"
+                        data-capacity="64G" data-price="$1,000">
+                        <td>iPhone 8+</td>
+                        <td>64G</td>
+                        <td class="price" data-price="$1,000">
+                            $1,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 8+"
+                        data-capacity="128G" data-price="$1,500">
+                        <td>iPhone 8+</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$1,500">
+                            $1,500
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 8+"
+                        data-capacity="256G" data-price="$1,700">
+                        <td>iPhone 8+</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$1,700">
+                            $1,700
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 8"
+                        data-capacity="64G" data-price="$1,000">
+                        <td>iPhone 8</td>
+                        <td>64G</td>
+                        <td class="price" data-price="$1,000">
+                            $1,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 8"
+                        data-capacity="128G" data-price="$1,000">
+                        <td>iPhone 8</td>
+                        <td>128G</td>
+                        <td class="price" data-price="$1,000">
+                            $1,000
+                        </td>
+                    </tr>
+                    
+                    <tr class="data-row type-iphone" 
+                        data-brand="Apple" data-model="iPhone 8"
+                        data-capacity="256G" data-price="$1,500">
+                        <td>iPhone 8</td>
+                        <td>256G</td>
+                        <td class="price" data-price="$1,500">
+                            $1,500
+                        </td>
+                    </tr>
+                    
+
+                    
+
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let currentBrand = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeCalculations();
+        });
+
+        function switchStaticTab(type) {
+            // Update tabs
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+            const tab = document.getElementById('tab-' + type.toLowerCase());
+            if (tab) tab.classList.add('active');
+
+            // Update rows
+            document.querySelectorAll('.type-iphone').forEach(el => el.style.display = type === 'iPhone' ? '' : 'none');
+            document.querySelectorAll('.type-android').forEach(el => el.style.display = type === 'Android' ? '' : 'none');
+        }
+
+        function initializeCalculations() {
+            const inputs = document.querySelectorAll('.deduction-input');
+            const globalInput = document.getElementById('global-deduction');
+
+            function customRound(price) {
+                const roundOptions = [0, 500, 700];
+                const base = Math.floor(price / 1000) * 1000;
+                let bestPrice = 0;
+                let minDiff = Infinity;
+
+                for (let i = -1; i <= 1; i++) {
+                    const currentBase = base + (i * 1000);
+                    for (const option of roundOptions) {
+                        const candidate = currentBase + option;
+                        if (candidate < 0) continue;
+                        const diff = Math.abs(price - candidate);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            bestPrice = candidate;
+                        } else if (diff === minDiff) {
+                            bestPrice = Math.max(bestPrice, candidate);
+                        }
+                    }
+                }
+                return bestPrice;
+            }
+
+            function calculateRow(input) {
+                const row = input.closest('tr');
+                const priceCell = row.querySelector('.price');
+                const finalPriceInput = row.querySelector('.final-price-input');
+                if (!priceCell || !finalPriceInput) return;
+
+                let priceStr = priceCell.getAttribute('data-price');
+                if (!priceStr) priceStr = priceCell.innerText.split('▲')[0].split('▼')[0].trim();
+
+                const maxPrice = parseInt(priceStr.replace(/[$, ]/g, '').trim());
+                let deduction = parseFloat(input.value);
+                if (isNaN(deduction) || deduction < 0) deduction = 0;
+                if (deduction > 100) deduction = 100;
+
+                if (!isNaN(maxPrice)) {
+                    const rawFinal = maxPrice * (1 - deduction / 100);
+                    const roundedFinal = customRound(rawFinal);
+                    finalPriceInput.value = roundedFinal <= 0 ? '$0' : '$' + roundedFinal.toLocaleString();
+                } else {
+                    finalPriceInput.value = '-';
+                }
+            }
+
+            inputs.forEach(input => {
+                input.addEventListener('input', function () {
+                    calculateRow(this);
+                });
+            });
+
+            if (globalInput) {
+                globalInput.addEventListener('input', function () {
+                    const globalValue = this.value;
+                    const deductionInputs = document.querySelectorAll('.deduction-input');
+                    deductionInputs.forEach(input => {
+                        input.value = globalValue;
+                        calculateRow(input);
+                    });
+                });
+            }
+        }
+
+        function loadBrandData(brand) {
+            currentBrand = brand;
+            const loading = document.getElementById('loading-indicator');
+            const tbody = document.getElementById('data-table-body');
+            const buttons = document.querySelectorAll('.brand-btn');
+
+            // 更新按鈕樣式
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            loading.style.display = 'block';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">載入中...</td></tr>';
+
+            fetch(`/api/get_brand_data/${brand}`)
+                .then(res => res.json())
+                .then(result => {
+                    loading.style.display = 'none';
+                    if (result.success) {
+                        renderBrandData(result.data, brand);
+                    } else {
+                        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: red;">載入失敗: ${result.message}</td></tr>`;
+                    }
+                })
+                .catch(err => {
+                    loading.style.display = 'none';
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: red;">載入錯誤: ${err.message}</td></tr>`;
+                });
+        }
+
+        function renderBrandData(data, brand) {
+            const tbody = document.getElementById('data-table-body');
+            tbody.innerHTML = '';
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">無資料</td></tr>';
+                return;
+            }
+
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = 'data-row';
+                row.setAttribute('data-brand', brand);
+                row.setAttribute('data-model', item.model);
+                row.setAttribute('data-capacity', item.capacity);
+
+                const defaultPrice = item.default_price || '-';
+
+                row.innerHTML = `
+                    <td>${brand}</td>
+                    <td>${item.model}</td>
+                    <td>${item.capacity}</td>
+                    <td class="price" data-price="${item.max_price}">${item.max_price}</td>
+                    <td>
+                        <input type="number" min="0" max="100" class="deduction-input"
+                            style="width: 60px; padding: 5px;" placeholder="%" autocomplete="off">
+                    </td>
+                    <td>
+                        <input type="text" class="final-price-input" value="${defaultPrice}" autocomplete="off">
+                    </td>
+                    <td>
+                        <button class="save-btn" onclick="savePrice(this)"
+                            style="cursor: pointer; border: none; background: none; font-size: 1.2em;"
+                            title="保存價格">💾</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            initializeCalculations();
+        }
+
+        function savePrice(btn) {
+            const row = btn.closest('tr');
+            const quoteNameInput = document.getElementById('quote-name');
+
+            if (!quoteNameInput || !quoteNameInput.value.startsWith('新增/')) {
+                alert('請先在上方輸入框輸入 "新增/報價單名稱" 指令！');
+                return;
+            }
+
+            const clientName = quoteNameInput.value.substring(3).trim();
+            const brand = row.getAttribute('data-brand');
+            const model = row.getAttribute('data-model');
+            const capacity = row.getAttribute('data-capacity');
+            const finalPriceInput = row.querySelector('.final-price-input');
+            const price = finalPriceInput.value;
+
+            fetch('/update_single_price', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    client_name: clientName,
+                    item: {
+                        brand: brand,
+                        model: model,
+                        capacity: capacity,
+                        price: price
+                    }
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('單筆保存成功！');
+                        const originalText = btn.innerText;
+                        btn.innerText = '✅';
+                        setTimeout(() => btn.innerText = originalText, 2000);
+                    } else {
+                        alert('保存失敗: ' + (data.message || '未知錯誤'));
+                    }
+                });
+        }
+
+        function handleCommand() {
+            const command = document.getElementById('quote-name').value.trim();
+            if (!command) return;
+
+            if (command === 'admintim') {
+                // Fetch admin path from backend
+                fetch('/get_admin_path')
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = `/${data.admin_path}`;
+                        } else {
+                            alert('Failed to get admin path: ' + (data.message || 'Unknown error'));
+                        }
+                    })
+                    .catch(err => {
+                        alert('Error: ' + err.message);
+                    });
+                return;
+            }
+
+            const rows = document.querySelectorAll('.data-row');
+            const items = [];
+
+            rows.forEach(row => {
+                const finalPriceInput = row.querySelector('.final-price-input');
+                const price = finalPriceInput.value;
+
+                if (price && price !== '-') {
+                    items.push({
+                        brand: row.getAttribute('data-brand'),
+                        model: row.getAttribute('data-model'),
+                        capacity: row.getAttribute('data-capacity'),
+                        price: price
+                    });
+                }
+            });
+
+            if (command.startsWith('刪除/')) {
+                const clientName = command.substring(3).trim();
+                if (!confirm(`確定要刪除報價單:${clientName} 嗎?此操作不可逆!`)) return;
+
+                fetch('/delete_quote', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ client_name: clientName })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        alert(data.message || '刪除失敗');
+                    });
+                return;
+            }
+
+            if (command.startsWith('新增/')) {
+                const clientName = command.substring(3).trim();
+
+                fetch('/generate_quote', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        client_name: clientName,
+                        items: items
+                    }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(`報價單 [${data.original_name}] 已更新!`);
+                            window.open(data.link, '_blank');
+                        } else {
+                            alert('生成/更新失敗: ' + (data.message || '未知錯誤'));
+                        }
+                    });
+                return;
+            }
+
+            const clientName = command;
+            fetch('/check_quote_exists', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: clientName })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.exists) {
+                        alert(`報價單 [${clientName}] 存在!`);
+                        window.open(data.link, '_blank');
+                    } else {
+                        alert(`報價單 [${clientName}] 不存在。請使用 "新增/${clientName}" 建立。`);
+                    }
+                });
+        }
+
+        function generatePDF() {
+            const dateDiv = document.getElementById('generation-date');
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('zh-TW', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            dateDiv.innerHTML = '<div class="generation-date-display">生成日期：' + dateStr + '</div>';
+            dateDiv.style.display = 'block';
+
+            const element = document.querySelector('.container');
+            const opt = {
+                margin: 10,
+                filename: '報價單_' + document.querySelector('h1').textContent + '_' + now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0') + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(function () {
+                setTimeout(function () {
+                    dateDiv.style.display = 'none';
+                }, 1000);
+            });
+        }
+
+        function shareToLine() {
+            const currentUrl = window.location.href;
+            const clientName = document.querySelector('h1').textContent;
+            const message = clientName + '\n' + currentUrl;
+            const lineUrl = 'https://line.me/R/msg/text/?' + encodeURIComponent(message);
+            window.open(lineUrl, '_blank');
+        }
+    </script>
+</body>
+
+</html>

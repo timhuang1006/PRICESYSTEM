@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>123 - 報價單</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .final-price {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .filter-controls {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            margin: 0 5px;
+            border: 1px solid #007bff;
+            background-color: white;
+            color: #007bff;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .filter-btn.active {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>123 報價單</h1>
+
+        <div class="filter-controls">
+            <button class="filter-btn active" onclick="filterData('all')">全部</button>
+            <button class="filter-btn" onclick="filterData('Apple')">iPhone</button>
+            <button class="filter-btn" onclick="filterData('Android')">Android</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>廠牌</th>
+                    <th>型號</th>
+                    <th>容量</th>
+                    <th>回收價</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 17 Pro Max</td>
+                    <td>1TB</td>
+                    <td class="final-price">46</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 17 Pro Max</td>
+                    <td>512GB</td>
+                    <td class="final-price">$40,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 17 Pro Max</td>
+                    <td>256GB</td>
+                    <td class="final-price">$36,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 17 Pro</td>
+                    <td>1TB</td>
+                    <td class="final-price">$40,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 17 Pro</td>
+                    <td>512GB</td>
+                    <td class="final-price">$35,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 17 Pro</td>
+                    <td>256GB</td>
+                    <td class="final-price">$29,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 17 Pro</td>
+                    <td>128GB</td>
+                    <td class="final-price">$26,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 17 Plus</td>
+                    <td>512GB</td>
+                    <td class="final-price">$30,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 17 Plus</td>
+                    <td>256GB</td>
+                    <td class="final-price">$25,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 17 Plus</td>
+                    <td>128GB</td>
+                    <td class="final-price">$23,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 17</td>
+                    <td>512GB</td>
+                    <td class="final-price">$27,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 17</td>
+                    <td>256GB</td>
+                    <td class="final-price">$22,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 17</td>
+                    <td>128GB</td>
+                    <td class="final-price">$20,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 16e</td>
+                    <td>128G</td>
+                    <td class="final-price">$9,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 16e</td>
+                    <td>256G</td>
+                    <td class="final-price">$10,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 16e</td>
+                    <td>512G</td>
+                    <td class="final-price">$12,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 16 Pro Max</td>
+                    <td>256G</td>
+                    <td class="final-price">$19,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 16 Pro Max</td>
+                    <td>512G</td>
+                    <td class="final-price">$21,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 16 Pro Max</td>
+                    <td>1T</td>
+                    <td class="final-price">$24,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 16 Pro</td>
+                    <td>128G</td>
+                    <td class="final-price">$15,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 16 Pro</td>
+                    <td>256G</td>
+                    <td class="final-price">$17,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 16 Pro</td>
+                    <td>512G</td>
+                    <td class="final-price">$19,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 16 Pro</td>
+                    <td>1T</td>
+                    <td class="final-price">$20,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 16 Plus</td>
+                    <td>128G</td>
+                    <td class="final-price">$13,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 16 Plus</td>
+                    <td>256G</td>
+                    <td class="final-price">$14,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 16 Plus</td>
+                    <td>512G</td>
+                    <td class="final-price">$16,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 16</td>
+                    <td>128G</td>
+                    <td class="final-price">$11,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 16</td>
+                    <td>256G</td>
+                    <td class="final-price">$12,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 16</td>
+                    <td>512G</td>
+                    <td class="final-price">$14,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 15 Pro Max</td>
+                    <td>256G</td>
+                    <td class="final-price">$14,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 15 Pro Max</td>
+                    <td>512G</td>
+                    <td class="final-price">$16,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 15 Pro Max</td>
+                    <td>1T</td>
+                    <td class="final-price">$18,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 15 Pro</td>
+                    <td>128G</td>
+                    <td class="final-price">$11,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 15 Pro</td>
+                    <td>256G</td>
+                    <td class="final-price">$13,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 15 Pro</td>
+                    <td>512G</td>
+                    <td class="final-price">$14,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 15 Pro</td>
+                    <td>1T</td>
+                    <td class="final-price">$15,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 15 Plus</td>
+                    <td>128G</td>
+                    <td class="final-price">$9,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 15 Plus</td>
+                    <td>256G</td>
+                    <td class="final-price">$10,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 15 Plus</td>
+                    <td>512G</td>
+                    <td class="final-price">$11,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 15</td>
+                    <td>128G</td>
+                    <td class="final-price">$8,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 15</td>
+                    <td>256G</td>
+                    <td class="final-price">$9,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 15</td>
+                    <td>512G</td>
+                    <td class="final-price">$10,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 14 Plus</td>
+                    <td>128G</td>
+                    <td class="final-price">$7,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 14 Plus</td>
+                    <td>256G</td>
+                    <td class="final-price">$7,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 14 Plus</td>
+                    <td>512G</td>
+                    <td class="final-price">$8,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 14 Pro</td>
+                    <td>128G</td>
+                    <td class="final-price">$8,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 14 Pro</td>
+                    <td>256G</td>
+                    <td class="final-price">$8,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 14 Pro</td>
+                    <td>512G</td>
+                    <td class="final-price">$9,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 14 Pro</td>
+                    <td>1T</td>
+                    <td class="final-price">$10,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 14 Pro Max</td>
+                    <td>128G</td>
+                    <td class="final-price">$11,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 14 Pro Max</td>
+                    <td>256G</td>
+                    <td class="final-price">$11,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 14 Pro Max</td>
+                    <td>512G</td>
+                    <td class="final-price">$12,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 14 Pro Max</td>
+                    <td>1T</td>
+                    <td class="final-price">$12,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 14</td>
+                    <td>128G</td>
+                    <td class="final-price">$6,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 14</td>
+                    <td>256G</td>
+                    <td class="final-price">$6,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 14</td>
+                    <td>512G</td>
+                    <td class="final-price">$7,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone SE3</td>
+                    <td>64G</td>
+                    <td class="final-price">$2,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone SE3</td>
+                    <td>128G</td>
+                    <td class="final-price">$2,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone SE3</td>
+                    <td>256G</td>
+                    <td class="final-price">$3,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 13 Pro Max</td>
+                    <td>128G</td>
+                    <td class="final-price">$7,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 13 Pro Max</td>
+                    <td>256G</td>
+                    <td class="final-price">$8,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 13 Pro Max</td>
+                    <td>512G</td>
+                    <td class="final-price">$8,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 13 Pro Max</td>
+                    <td>1T</td>
+                    <td class="final-price">$9,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 13 Pro</td>
+                    <td>128G</td>
+                    <td class="final-price">$6,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 13 Pro</td>
+                    <td>256G</td>
+                    <td class="final-price">$6,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 13 Pro</td>
+                    <td>512G</td>
+                    <td class="final-price">$7,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 13 Pro</td>
+                    <td>1T</td>
+                    <td class="final-price">$7,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 13</td>
+                    <td>128G</td>
+                    <td class="final-price">$4,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 13</td>
+                    <td>256G</td>
+                    <td class="final-price">$5,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 13</td>
+                    <td>512G</td>
+                    <td class="final-price">$5,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 13 mini</td>
+                    <td>128G</td>
+                    <td class="final-price">$4,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 13 mini</td>
+                    <td>256G</td>
+                    <td class="final-price">$4,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 13 mini</td>
+                    <td>512G</td>
+                    <td class="final-price">$5,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 12 Pro Max</td>
+                    <td>128G</td>
+                    <td class="final-price">$5,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 12 Pro Max</td>
+                    <td>256G</td>
+                    <td class="final-price">$6,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 12 Pro Max</td>
+                    <td>512G</td>
+                    <td class="final-price">$6,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 12 mini</td>
+                    <td>64G</td>
+                    <td class="final-price">$2,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 12 mini</td>
+                    <td>128G</td>
+                    <td class="final-price">$2,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 12 mini</td>
+                    <td>256G</td>
+                    <td class="final-price">$3,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 12 Pro</td>
+                    <td>128G</td>
+                    <td class="final-price">$4,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 12 Pro</td>
+                    <td>256G</td>
+                    <td class="final-price">$4,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 12 Pro</td>
+                    <td>512G</td>
+                    <td class="final-price">$4,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 12</td>
+                    <td>64G</td>
+                    <td class="final-price">$3,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 12</td>
+                    <td>128G</td>
+                    <td class="final-price">$3,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 12</td>
+                    <td>256G</td>
+                    <td class="final-price">$3,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone SE2</td>
+                    <td>64G</td>
+                    <td class="final-price">$1,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone SE2</td>
+                    <td>128G</td>
+                    <td class="final-price">$1,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone SE2</td>
+                    <td>256G</td>
+                    <td class="final-price">$1,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 11 ProMax</td>
+                    <td>64G</td>
+                    <td class="final-price">$3,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 11 ProMax</td>
+                    <td>256G</td>
+                    <td class="final-price">$3,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 11 ProMax</td>
+                    <td>512G</td>
+                    <td class="final-price">$3,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 11 Pro</td>
+                    <td>64G</td>
+                    <td class="final-price">$2,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 11 Pro</td>
+                    <td>256G</td>
+                    <td class="final-price">$3,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 11 Pro</td>
+                    <td>512G</td>
+                    <td class="final-price">$3,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 11</td>
+                    <td>64G</td>
+                    <td class="final-price">$2,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 11</td>
+                    <td>128G</td>
+                    <td class="final-price">$2,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 11</td>
+                    <td>256G</td>
+                    <td class="final-price">$3,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone XR</td>
+                    <td>64G</td>
+                    <td class="final-price">$1,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone XR</td>
+                    <td>128G</td>
+                    <td class="final-price">$2,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone XR</td>
+                    <td>256G</td>
+                    <td class="final-price">$2,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone Xs Max</td>
+                    <td>64G</td>
+                    <td class="final-price">$2,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone Xs Max</td>
+                    <td>256G</td>
+                    <td class="final-price">$2,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone Xs Max</td>
+                    <td>512G</td>
+                    <td class="final-price">$2,700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone Xs</td>
+                    <td>64G</td>
+                    <td class="final-price">$1,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone Xs</td>
+                    <td>256G</td>
+                    <td class="final-price">$1,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone Xs</td>
+                    <td>512G</td>
+                    <td class="final-price">$2,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone X</td>
+                    <td>64G</td>
+                    <td class="final-price">$1,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone X</td>
+                    <td>256G</td>
+                    <td class="final-price">$1,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 8+</td>
+                    <td>64G</td>
+                    <td class="final-price">$1,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 8+</td>
+                    <td>128G</td>
+                    <td class="final-price">$1,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 8+</td>
+                    <td>256G</td>
+                    <td class="final-price">$1,500</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 8</td>
+                    <td>64G</td>
+                    <td class="final-price">$700</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 8</td>
+                    <td>128G</td>
+                    <td class="final-price">$1,000</td>
+                </tr>
+                
+                <tr class="data-row" data-brand="Apple">
+                    <td>Apple</td>
+                    <td>iPhone 8</td>
+                    <td>256G</td>
+                    <td class="final-price">$1,000</td>
+                </tr>
+                
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function filterData(type) {
+            const rows = document.querySelectorAll('.data-row');
+            const buttons = document.querySelectorAll('.filter-btn');
+
+            // Update buttons
+            buttons.forEach(btn => {
+                if (btn.innerText === (type === 'all' ? '全部' : (type === 'Apple' ? 'iPhone' : 'Android'))) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            rows.forEach(row => {
+                const brand = row.getAttribute('data-brand');
+                if (type === 'all') {
+                    row.style.display = '';
+                } else if (type === 'Apple') {
+                    if (brand === 'Apple') row.style.display = '';
+                    else row.style.display = 'none';
+                } else if (type === 'Android') {
+                    if (brand !== 'Apple') row.style.display = '';
+                    else row.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
